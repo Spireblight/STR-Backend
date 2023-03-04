@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Viewer Page</title>
+    <link href="https://fonts.googleapis.com/css?family=Kreon:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="video_overlay_style.css">
+</head>
+<body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <script src="jquery-3.3.1.min.js" type="text/javascript"></script>
+    <script src="lz-string.min.js" type="text/javascript"></script>
+    <script src="viewer-common.min.js" type="text/javascript"></script>
+    <script src="viewer-tips.min.js" type="text/javascript"></script>
+    <script src="viewer-deck-view.min.js" type="text/javascript"></script>
+    <script src="viewer-card-view.min.js" type="text/javascript"></script>
+    <script src="viewer.min.js" type="text/javascript"></script>
+
+    <div id="items" width="100%" height="100%">
+        <div id="temp" style="visibility: hidden"></div>
+    </div>
+    <div id="deck_button"></div>
+    <div id="deck_button_keybinding_tip" class="keybinding-tip outline-black" style="top: 8.7%; right: 5.02%; display: none">(D)</div>
+    <div id="deck_view" tabindex="-1">
+        <div id="deck_view_content">
+            <div id="deck_view_content_wrap"></div>
+        </div>
+        <div id="deck_view_return_btn"></div>
+        <div id="deck_view_left_bar"></div>
+        <div id="deck_view_right_bar"></div>
+        <div class="keybinding-tip outline-black" style="top: 2.5%; right: 3%">(Close - D/Q)</div>
+        <div id="keybinding_hints_checkbox"><span class="outline-black">Show Shortcuts</span></div>
+    </div>
+    <div id="card_view" tabindex="-1">
+        <div id="card_view_prev_btn" tabindex="-1">
+            <div class="keybinding-tip outline-black" style="left:37%; top: 43%;">(&larr;/A)</div>
+        </div>
+        <div id="card_view_next_btn" tabindex="-1">
+            <div class="keybinding-tip outline-black" style="left:22.4%; top: 43%;">(&rarr;/D)</div>
+        </div>
+        <div id="card_view_checkbox" tabindex="-1" class="card-view-checkbox-unchecked"></div>
+        <div id="card_view_tips_box"></div>
+        <div class="keybinding-tip outline-black" style="bottom: 6.94%; left: 56.5%">(U)</div>
+        <div class="keybinding-tip outline-black" style="top: 5.5%; right: 3%">(Close - Q)</div>
+        
+    </div>
+    <div id="placeholder"></div>
+    <div id="temp_card_description"></div>
+    <div id="temp_card_title"></div>
+</body>
+</html>
+
