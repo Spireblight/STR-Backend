@@ -3,6 +3,7 @@ package slaytherelics
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	"gotest.tools/v3/assert"
@@ -33,7 +34,7 @@ func TestPubSubMessageUnmarshalJSON(t *testing.T) {
 			inputFilePath: "testdata/deck_msg.json", // Mod ref - https://github.com/Spireblight/STR-Extension/blob/c069792cdda4c7a01266cc41f2ea8b1583162d4b/twitch_demo/deck_msg.txt
 			expectedOutput: PubSubMessage{
 				MessageType: MessageTypeDeck,
-				Streamer: Streamer{
+				Streamer: &Streamer{
 					Login:  "arrakisdev",
 					Secret: "yxk1d4kv3zz5bb4u8byp",
 				},
@@ -50,7 +51,7 @@ func TestPubSubMessageUnmarshalJSON(t *testing.T) {
 			inputFilePath: "testdata/okay_msg.json", // Mod ref - https://github.com/Spireblight/STR-Extension/blob/c069792cdda4c7a01266cc41f2ea8b1583162d4b/twitch_demo/okay_msg.txt
 			expectedOutput: PubSubMessage{
 				MessageType: MessageTypeOK,
-				Streamer: Streamer{
+				Streamer: &Streamer{
 					Login:  "arrakisdev",
 					Secret: "yxk1d4kv3zz5bb4u8byp",
 				},
@@ -65,7 +66,7 @@ func TestPubSubMessageUnmarshalJSON(t *testing.T) {
 			inputFilePath: "testdata/tips_msg.json", // Mod ref - https://github.com/Spireblight/STR-Extension/blob/c069792cdda4c7a01266cc41f2ea8b1583162d4b/twitch_demo/tips_msg.txt
 			expectedOutput: PubSubMessage{
 				MessageType: MessageTypeTips,
-				Streamer: Streamer{
+				Streamer: &Streamer{
 					Login:  "arrakisdev",
 					Secret: "yxk1d4kv3zz5bb4u8byp",
 				},
@@ -96,6 +97,14 @@ func TestPubSubMessageUnmarshalJSON(t *testing.T) {
 			assert.NilError(t, err)
 
 			assert.DeepEqual(t, result, tc.expectedOutput)
+
+			// assert that we can marshal it back to JSON and get the same result
+			marshaled, err := json.Marshal(result)
+			assert.NilError(t, err)
+
+			// remove html escape bs, note that this escape also
+			resultStr := strings.ReplaceAll(string(marshaled), `\u0026`, `&`)
+			assert.Equal(t, resultStr, string(input))
 		})
 	}
 }
