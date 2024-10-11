@@ -14,7 +14,7 @@ import (
 
 type dummyMessage struct {
 	broadcasterID string
-	typ           int
+	typ           MessageType
 	message       string
 }
 
@@ -23,7 +23,7 @@ type pubSubStub struct {
 }
 
 func (p *pubSubStub) SendMessage(ctx context.Context,
-	broadcasterID string, messageType int, message map[string]any) error {
+	broadcasterID string, messageType MessageType, message interface{}) error {
 
 	js, err := json.Marshal(message)
 	if err != nil {
