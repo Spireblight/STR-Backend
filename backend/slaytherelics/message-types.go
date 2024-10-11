@@ -67,12 +67,14 @@ func (psm *PubSubMessage) UnmarshalJSON(data []byte) (err error) {
 		// TODO: implement rest of message types when necessary
 		switch psm.MessageType {
 		case MessageTypeDeck:
-			psm.MessageContent = MessageContentDeck{}
+			mc := MessageContentDeck{}
 
-			err := json.Unmarshal(aux.MessageContent, &psm.MessageContent)
+			err := json.Unmarshal(aux.MessageContent, &mc)
 			if err != nil {
 				return err
 			}
+
+			psm.MessageContent = mc
 
 		default:
 			psm.MessageContent = MessageContentUnknown(aux.MessageContent)
