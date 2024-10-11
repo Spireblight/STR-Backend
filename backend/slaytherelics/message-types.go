@@ -77,6 +77,7 @@ func (psm *PubSubMessage) UnmarshalJSON(data []byte) (err error) {
 			psm.MessageContent = mc
 
 		default:
+			// this has the added benefit that we don't have to remarshal it as a map later if we don't actually need to read the data
 			psm.MessageContent = MessageContentUnknown(aux.MessageContent)
 		}
 	}
