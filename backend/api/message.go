@@ -69,7 +69,7 @@ func (a *API) broadcast(c *gin.Context,
 		attribute.Int("delay_ms", msg.Delay),
 	))
 
-	err := a.broadcaster.Broadcast(ctx, time.Duration(msg.Delay)*time.Millisecond, userID, msg.MessageType, msg.MessageContent)
+	err := a.broadcaster.Broadcast(ctx, time.Duration(msg.Delay)*time.Millisecond, userID, int(msg.MessageType), msg.MessageContent)
 	timeout := &errors2.Timeout{}
 	if errors.As(err, &timeout) {
 		c.Data(202, "application/json; charset=utf-8", []byte("Success\n"))
