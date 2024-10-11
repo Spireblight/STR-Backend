@@ -3,10 +3,10 @@ package api
 import (
 	"context"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 
 	"github.com/MaT1g3R/slaytherelics/o11y"
+	"github.com/google/uuid"
 	"gotest.tools/v3/assert"
 )
 
@@ -57,9 +57,9 @@ func TestAPIHandler(t *testing.T) {
 			},
 		}
 
-		for i, tc := range tcs {
+		for _, tc := range tcs {
 			t.Run(tc.name, func(t *testing.T) {
-				deckName := "deck" + string(strconv.AppendInt(nil, int64(i), 10))
+				deckName := uuid.New().String()
 				// use lock if adding t.Parallel
 				apiHandler.deckLists[deckName] = tc.deckRawContent
 
@@ -76,7 +76,7 @@ func TestAPIHandler(t *testing.T) {
 		}
 
 		t.Run("not found", func(t *testing.T) {
-			req := httptest.NewRequest("GET", "/deck/something_not_made", nil)
+			req := httptest.NewRequest("GET", "/deck/"+uuid.New().String(), nil)
 			w := httptest.NewRecorder()
 			handlerFunc.ServeHTTP(w, req)
 
