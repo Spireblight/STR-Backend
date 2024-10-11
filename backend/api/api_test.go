@@ -57,7 +57,7 @@ func TestAPIHandler(t *testing.T) {
 		for i, tc := range tcs {
 			t.Run(tc.name, func(t *testing.T) {
 				deckName := "deck" + string(strconv.AppendInt(nil, int64(i), 10))
-
+				// use lock if adding t.Parallel
 				apiHandler.deckLists[deckName] = tc.deckRawContent
 
 				req := httptest.NewRequest("GET", "/deck/"+deckName, nil)
