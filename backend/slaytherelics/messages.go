@@ -38,13 +38,13 @@ func stringChunks(s string, chunkSize int) []string {
 }
 
 func (m *Messages) SendMessage(ctx context.Context,
-	broadcasterID string, messageType int, message map[string]any) (err error) {
+	broadcasterID string, messageType MessageType, message interface{}) (err error) {
 
 	ctx, span := o11y.Tracer.Start(ctx, "messages: send message")
 	defer o11y.End(&span, &err)
 	span.SetAttributes(
 		attribute.String("broadcaster_id", broadcasterID),
-		attribute.Int("message_type", messageType),
+		attribute.Int("message_type", int(messageType)),
 	)
 
 	chunkHistogram, _ := o11y.Meter.Int64Histogram("send_message.chunks")
@@ -66,7 +66,7 @@ func (m *Messages) SendMessage(ctx context.Context,
 		chunkHistogram.Record(ctx, int64(numChunks),
 			metric.WithAttributes(
 				attribute.String("broadcaster_id", broadcasterID),
-				attribute.Int("message_type", messageType),
+				attribute.Int("message_type", int(messageType)),
 			),
 		)
 	}
