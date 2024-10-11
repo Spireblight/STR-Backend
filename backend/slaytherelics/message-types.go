@@ -67,7 +67,7 @@ func (psm *PubSubMessage) UnmarshalJSON(data []byte) (err error) {
 		// TODO: implement rest of message types when necessary
 		switch psm.MessageType {
 		case MessageTypeDeck:
-			mc := MessageContentDeck{}
+			mc := MessageContentDeck{} // need to unmarshal into non-interface type
 
 			err := json.Unmarshal(aux.MessageContent, &mc)
 			if err != nil {
