@@ -56,7 +56,7 @@ func TestPubSubMessageUnmarshalJSON(t *testing.T) {
 				},
 				Metadata:       map[string]interface{}{"version": "1.1.0"},
 				Delay:          7045,
-				MessageContent: MessageContentUnknown(""),
+				MessageContent: MessageContentUnknown(`""`),
 			},
 		},
 		{
