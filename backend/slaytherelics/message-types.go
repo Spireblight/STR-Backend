@@ -20,6 +20,11 @@ const (
 // MessageContentUnknown placeholder for unknown message content type.
 type MessageContentUnknown []byte
 
+// MarshalJSON implements json.Marshaler for MessageContentUnknown. Just so we don't have to remarshal something we don't need to parse
+func (mc MessageContentUnknown) MarshalJSON() ([]byte, error) {
+	return mc, nil
+}
+
 // MessageContentDeck message content structure for MessageTypeDeck. Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/builders/DeckJSONBuilder.java#L59
 type MessageContentDeck struct {
 	Character string `json:"c"` // Character name string.
