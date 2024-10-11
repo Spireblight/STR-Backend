@@ -56,10 +56,10 @@ func TestBroadcaster(t *testing.T) {
 	broadcaster, err := NewBroadcaster(pubsub, 2, 10*time.Millisecond, time.Second*2)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, keepAlive, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, MessageTypeOK, messageKeepAlive)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, keepAlive, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, MessageTypeOK, messageKeepAlive)
 	assert.NilError(t, err)
 
 	time.Sleep(1 * time.Second)
@@ -76,10 +76,10 @@ func TestBroadcaster(t *testing.T) {
 	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, 3, messageOther2)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, keepAlive, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, MessageTypeOK, messageKeepAlive)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, keepAlive, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, MessageTypeOK, messageKeepAlive)
 	assert.NilError(t, err)
 
 	time.Sleep(time.Second * 3)

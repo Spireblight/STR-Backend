@@ -14,8 +14,6 @@ import (
 	"github.com/MaT1g3R/slaytherelics/o11y"
 )
 
-const keepAlive = 5
-
 var sentinel = struct{}{}
 
 type PubSub interface {
@@ -156,9 +154,9 @@ func (s *sender) sendAll() (err error) {
 func (s *sender) send(ctx context.Context, typ MessageType, m interface{}) (err error) {
 	ctx, span := o11y.Tracer.Start(ctx, "broadcaster: send message")
 	defer o11y.End(&span, &err)
-	span.SetAttributes(attribute.Bool("keep_alive", typ == keepAlive))
+	span.SetAttributes(attribute.Bool("keep_alive", typ == MessageTypeOK))
 
-	if typ != keepAlive {
+	if typ != MessageTypeOK {
 		s.state.Store(typ, m)
 		return s.broadcaster.messages.SendMessage(ctx, s.broadcasterID, typ, m)
 	}
