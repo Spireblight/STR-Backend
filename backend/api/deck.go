@@ -1,10 +1,12 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -55,15 +57,15 @@ func formatDeck(deck map[string]int) []byte {
 		return i < j
 	})
 
-	buf := make([]byte, 0, 2048) // typically ends up being around 2KB (for the "large deck" case)
+	buf := bytes.NewBuffer(make([]byte, 0, 2048)) // typically ends up being around 2KB (for the "large deck" case)
 	for _, key := range keys {
-		buf = append(buf, key...)
-		buf = append(buf, " x"...)
-		buf = strconv.AppendInt(buf, int64(deck[key]), 10)
-		buf = append(buf, '\n')
+		buf.Write([]byte(key))
+		buf.Write([]byte(" x"))
+		buf.WriteString(strconv.Itoa(deck[key]))
+		buf.Write([]byte("\n"))
 	}
 
-	return buf
+	return buf.Bytes()
 }
 
 func escapeRegexp(s string) string {
