@@ -51,7 +51,7 @@ func NewBroadcaster(
 }
 
 func (b *Broadcaster) Broadcast(ctx context.Context,
-	delay time.Duration, broadcasterID string, int int, message interface{}) (err error) {
+	delay time.Duration, broadcasterID string, messageType int, message interface{}) (err error) {
 	ctx, span := o11y.Tracer.Start(ctx, "broadcaster: broadcast")
 	defer o11y.End(&span, &err)
 
@@ -65,7 +65,7 @@ func (b *Broadcaster) Broadcast(ctx context.Context,
 	}
 
 	time.Sleep(delay)
-	return sender.send(ctx, int, message)
+	return sender.send(ctx, messageType, message)
 }
 
 type sender struct {
