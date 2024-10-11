@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/MaT1g3R/slaytherelics/broadcaster"
 	"github.com/MaT1g3R/slaytherelics/client"
 	"github.com/MaT1g3R/slaytherelics/o11y"
 	"github.com/MaT1g3R/slaytherelics/slaytherelics"
@@ -15,13 +16,13 @@ type API struct {
 
 	twitch      *client.Twitch
 	users       *slaytherelics.Users
-	broadcaster *slaytherelics.Broadcaster
+	broadcaster *broadcaster.Broadcaster
 
 	deckLists map[string]string
 	deckLock  *sync.RWMutex
 }
 
-func New(t *client.Twitch, u *slaytherelics.Users, b *slaytherelics.Broadcaster) (*API, error) {
+func New(t *client.Twitch, u *slaytherelics.Users, b *broadcaster.Broadcaster) (*API, error) {
 	r := gin.Default()
 	r.Use(o11y.Middleware)
 
