@@ -1,13 +1,8 @@
 package slaytherelics
 
-// RequestMessage message format for incoming messages from the Java mod. Tags are used for JSON encoding, not decoding
-// Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/main/src/main/java/str_exporter/builders/JSONMessageBuilder.java
-type PubSubMessage struct {
-	MessageType    MessageType    `json:"msg_type"`
-	Metadata       map[string]any `json:"meta"` // keeping as map as this can include stuff other than version that we would want to forward
-	Delay          int            `json:"delay"`
-	MessageContent interface{}    `json:"message"` // keep interface so that we can still pass through the message as is without having to implement type for it
-}
+import (
+	"encoding/json"
+)
 
 // MessageType type of message being received from the Java mod (as JSON).
 // Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/builders/JSONMessageBuilder.java#L18
@@ -22,9 +17,62 @@ const (
 	MessageTypeOK   // 5 - basically our keep-alive message. Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/SlayTheRelicsExporter.java#L114
 )
 
-// MessageContentUnknown placeholder for unknown message content type
-type MessageContentUnknown interface{}
+// MessageContentUnknown placeholder for unknown message content type.
+type MessageContentUnknown []byte
 
-// MessageContentDeck message content structure for MessageTypeDeck
+// MessageContentDeck message content structure for MessageTypeDeck. Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/builders/DeckJSONBuilder.java#L59
 type MessageContentDeck struct {
+	Character string `json:"c"` // Character name string.
+	Deck      string `json:"k"` // Includes all info about tooltips for each card.
+}
+
+// RequestMessage message format for incoming messages from the Java mod. Tags are used for JSON encoding, not decoding
+// Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/main/src/main/java/str_exporter/builders/JSONMessageBuilder.java
+type PubSubMessage struct {
+	MessageType MessageType `json:"msg_type"`
+	Streamer    struct {
+		Login  string `json:"login"`
+		Secret string `json:"secret"`
+	} `json:"streamer"`
+	Metadata       map[string]any `json:"meta"` // Keep as map as this can include stuff other than version that we would want to forward.
+	Delay          int            `json:"delay"`
+	MessageContent interface{}    `json:"message"` // Keep interface so that we can still pass through the message as is without having to implement a type for it.
+}
+
+// UnmarshalJSON implements json.Unmarshaler for PubSubMessage. Used to handle the casting separately for later use.
+func (psm *PubSubMessage) UnmarshalJSON(data []byte) (err error) {
+	type Alias PubSubMessage
+
+	// unmarshal into proxy
+	aux := &struct {
+		MessageContent json.RawMessage `json:"message"` // will take priority on marshalling for this obj over PubSubMessage.MessageContent
+		*Alias
+	}{
+		Alias: (*Alias)(psm),
+	}
+
+	// we have to reflect, gross but we are using JSON and not msgp
+	err = json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+
+	// check if we have a message content
+	if aux.MessageContent != nil {
+		// TODO: implement rest of message types when necessary
+		switch psm.MessageType {
+		case MessageTypeDeck:
+			psm.MessageContent = MessageContentDeck{}
+
+			err := json.Unmarshal(aux.MessageContent, &psm.MessageContent)
+			if err != nil {
+				return err
+			}
+
+		default:
+			psm.MessageContent = MessageContentUnknown(aux.MessageContent)
+		}
+	}
+
+	return nil
 }
