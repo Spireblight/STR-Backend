@@ -27,14 +27,14 @@ func (mc MessageContentUnknown) MarshalJSON() ([]byte, error) {
 
 // MessageContentDeck message content structure for MessageTypeDeck. Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/builders/DeckJSONBuilder.java#L59
 type MessageContentDeck struct {
-	Character string `json:"c"` // Character name string.
-	Deck      string `json:"k"` // Includes all info about tooltips for each card. TODO: Implement struct that manages parsing this
+	Character string `json:"c,omitempty"` // Character name string.
+	Deck      string `json:"k,omitempty"` // Includes all info about tooltips for each card. TODO: Implement struct that manages parsing this
 }
 
 // Streamer auth token info for a given message. Mod ref - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/client/Message.java#L12
 type Streamer struct {
-	Login  string `json:"login"`
-	Secret string `json:"secret"`
+	Login  string `json:"login,omitempty"`
+	Secret string `json:"secret,omitempty"`
 }
 
 // RequestMessage message format for incoming messages from the Java mod. Tags are used for JSON encoding, not decoding
@@ -42,11 +42,11 @@ type Streamer struct {
 // - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/client/Message.java#L5
 // - https://github.com/Spireblight/STR-Spire-Mod/blob/main/src/main/java/str_exporter/builders/JSONMessageBuilder.java
 type PubSubMessage struct {
-	MessageType    MessageType    `json:"msg_type"`
-	Streamer       Streamer       `json:"streamer"`
-	Metadata       map[string]any `json:"meta"` // Keep as map as this can include stuff other than version that we would want to forward.
-	Delay          int            `json:"delay"`
-	MessageContent interface{}    `json:"message"` // Keep interface so that we can still pass through the message as is without having to implement a type for it.
+	MessageType    MessageType    `json:"msg_type,omitempty"`
+	Streamer       *Streamer      `json:"streamer,omitempty"` // Pointer so that it gets omitted if empty
+	Metadata       map[string]any `json:"meta,omitempty"`     // Keep as map as this can include stuff other than version that we would want to forward.
+	Delay          int            `json:"delay,omitempty"`
+	MessageContent interface{}    `json:"message,omitempty"` // Keep interface so that we can still pass through the message as is without having to implement a type for it.
 }
 
 // UnmarshalJSON implements json.Unmarshaler for PubSubMessage. Used to handle the casting separately for later use.
@@ -55,7 +55,7 @@ func (psm *PubSubMessage) UnmarshalJSON(data []byte) (err error) {
 
 	// unmarshal into proxy
 	aux := &struct {
-		MessageContent json.RawMessage `json:"message"` // will take priority on marshalling for this obj over PubSubMessage.MessageContent
+		MessageContent json.RawMessage `json:"message,omitempty"` // will take priority on marshalling for this obj over PubSubMessage.MessageContent
 		*Alias
 	}{
 		Alias: (*Alias)(psm),
