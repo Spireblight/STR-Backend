@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http/httptest"
 	"strconv"
 	"testing"
@@ -10,7 +11,9 @@ import (
 )
 
 func TestAPIHandler(t *testing.T) {
-	o11y.InitStub()
+	ctx := context.Background()
+	cancel := o11y.Init("test")
+	defer cancel(ctx)
 
 	// TODO: stubs for each service
 	apiHandler, err := New(nil, nil, nil)
