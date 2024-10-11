@@ -34,11 +34,17 @@ func (a *API) getDeckHandler(c *gin.Context) {
 		return
 	}
 
-	keys := make([]string, 0, len(d))
-	for k := range d {
+	c.Data(200, "text/plain", formatDeck(d))
+}
+
+// formatDeck convert deck card count map into readable string
+func formatDeck(deck map[string]int) []byte {
+	keys := make([]string, 0, len(deck))
+	for k := range deck {
 		keys = append(keys, k)
 	}
 
+	// put Ascender's Bane at the end
 	slices.SortFunc(keys, func(i, j string) bool {
 		if i == "Ascender's Bane" {
 			return false
@@ -49,15 +55,15 @@ func (a *API) getDeckHandler(c *gin.Context) {
 		return i < j
 	})
 
-	result := strings.Builder{}
-	for _, k := range keys {
-		result.WriteString(k)
-		result.WriteString(" x")
-		result.WriteString(fmt.Sprint(d[k]))
-		result.WriteString("\n")
+	buf := make([]byte, 0, 2048) // typically ends up being around 2KB (for the "large deck" case)
+	for _, key := range keys {
+		buf = append(buf, key...)
+		buf = append(buf, " x"...)
+		buf = strconv.AppendInt(buf, int64(deck[key]), 10)
+		buf = append(buf, '\n')
 	}
 
-	c.Data(200, "text/plain", []byte(result.String()))
+	return buf
 }
 
 func escapeRegexp(s string) string {
