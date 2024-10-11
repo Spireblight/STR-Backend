@@ -5,9 +5,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/MaT1g3R/slaytherelics/o11y"
 	"github.com/google/uuid"
 	"gotest.tools/v3/assert"
+
+	"github.com/MaT1g3R/slaytherelics/o11y"
 )
 
 func TestAPIHandler(t *testing.T) {
