@@ -9,7 +9,6 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	meternoop "go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -54,12 +53,4 @@ func Init(serviceName string) func(context.Context) {
 	Meter = otel.Meter(serviceName)
 
 	return shutdown
-}
-
-// InitStub sets metric and tracer handlers to no-op implementations.
-func InitStub() func(context.Context) {
-	Tracer = trace.NewNoopTracerProvider().Tracer("stub")
-	Meter = meternoop.Meter{}
-
-	return func(ctx context.Context) {}
 }
