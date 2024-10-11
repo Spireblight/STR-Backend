@@ -1,4 +1,4 @@
-package slaytherelics
+package broadcaster
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 
 type dummyMessage struct {
 	broadcasterID string
-	typ           MessageType
+	typ           int
 	message       string
 }
 
@@ -23,7 +23,7 @@ type pubSubStub struct {
 }
 
 func (p *pubSubStub) SendMessage(ctx context.Context,
-	broadcasterID string, messageType MessageType, message interface{}) error {
+	broadcasterID string, messageType int, message interface{}) error {
 
 	js, err := json.Marshal(message)
 	if err != nil {
@@ -56,10 +56,10 @@ func TestBroadcaster(t *testing.T) {
 	broadcaster, err := NewBroadcaster(pubsub, 2, 10*time.Millisecond, time.Second*2)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, MessageTypeOK, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, keepAlive, messageKeepAlive)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, MessageTypeOK, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, keepAlive, messageKeepAlive)
 	assert.NilError(t, err)
 
 	time.Sleep(1 * time.Second)
@@ -76,10 +76,10 @@ func TestBroadcaster(t *testing.T) {
 	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, 3, messageOther2)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, MessageTypeOK, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID1, keepAlive, messageKeepAlive)
 	assert.NilError(t, err)
 
-	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, MessageTypeOK, messageKeepAlive)
+	err = broadcaster.Broadcast(ctx, time.Nanosecond, broadcasterID2, keepAlive, messageKeepAlive)
 	assert.NilError(t, err)
 
 	time.Sleep(time.Second * 3)

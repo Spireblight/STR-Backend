@@ -1,4 +1,4 @@
-package slaytherelics
+package broadcaster
 
 import (
 	"context"
@@ -14,10 +14,12 @@ import (
 	"github.com/MaT1g3R/slaytherelics/o11y"
 )
 
+const keepAlive = 5
+
 var sentinel = struct{}{}
 
 type PubSub interface {
-	SendMessage(ctx context.Context, broadcasterID string, messageType MessageType, message interface{}) error
+	SendMessage(ctx context.Context, broadcasterID string, int int, message interface{}) error
 }
 
 type Broadcaster struct {
@@ -49,7 +51,7 @@ func NewBroadcaster(
 }
 
 func (b *Broadcaster) Broadcast(ctx context.Context,
-	delay time.Duration, broadcasterID string, messageType MessageType, message interface{}) (err error) {
+	delay time.Duration, broadcasterID string, int int, message interface{}) (err error) {
 	ctx, span := o11y.Tracer.Start(ctx, "broadcaster: broadcast")
 	defer o11y.End(&span, &err)
 
@@ -63,7 +65,7 @@ func (b *Broadcaster) Broadcast(ctx context.Context,
 	}
 
 	time.Sleep(delay)
-	return sender.send(ctx, messageType, message)
+	return sender.send(ctx, int, message)
 }
 
 type sender struct {
@@ -144,19 +146,19 @@ func (s *sender) sendAll() (err error) {
 	span.SetAttributes(attribute.String("broadcaster_id", s.broadcasterID))
 
 	s.state.Range(func(typ, msg interface{}) bool {
-		sErr := s.broadcaster.messages.SendMessage(ctx, s.broadcasterID, typ.(MessageType), msg.(map[string]any))
+		sErr := s.broadcaster.messages.SendMessage(ctx, s.broadcasterID, typ.(int), msg.(map[string]any))
 		err = errors.Join(err, sErr)
 		return true
 	})
 	return err
 }
 
-func (s *sender) send(ctx context.Context, typ MessageType, m interface{}) (err error) {
+func (s *sender) send(ctx context.Context, typ int, m interface{}) (err error) {
 	ctx, span := o11y.Tracer.Start(ctx, "broadcaster: send message")
 	defer o11y.End(&span, &err)
-	span.SetAttributes(attribute.Bool("keep_alive", typ == MessageTypeOK))
+	span.SetAttributes(attribute.Bool("keep_alive", typ == keepAlive))
 
-	if typ != MessageTypeOK {
+	if typ != keepAlive {
 		s.state.Store(typ, m)
 		return s.broadcaster.messages.SendMessage(ctx, s.broadcasterID, typ, m)
 	}
