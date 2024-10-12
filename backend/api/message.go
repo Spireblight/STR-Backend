@@ -34,7 +34,11 @@ func (a *API) postMessageHandler(c *gin.Context) {
 		return
 	}
 
-	// TODO: validate message content
+	// make sure that we have message content len > 0
+	if pubSubMessage.MessageContent == nil {
+		c.JSON(400, gin.H{})
+		return
+	}
 
 	user, err := a.users.AuthenticateRedis(ctx, pubSubMessage.Streamer.Login, pubSubMessage.Streamer.Secret)
 	authError := &errors2.AuthError{}
