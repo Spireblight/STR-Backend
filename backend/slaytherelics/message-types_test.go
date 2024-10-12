@@ -102,7 +102,7 @@ func TestPubSubMessageUnmarshalJSON(t *testing.T) {
 			marshaled, err := json.Marshal(result)
 			assert.NilError(t, err)
 
-			// remove html escape bs, note that this escape also
+			// remove html escape bs, note that this escape also gets hit by the broadcaster anyways
 			resultStr := strings.ReplaceAll(string(marshaled), `\u0026`, `&`)
 			assert.Equal(t, resultStr, string(input))
 		})
