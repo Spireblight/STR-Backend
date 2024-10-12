@@ -44,7 +44,7 @@ func (m *Messages) SendMessage(ctx context.Context,
 	defer o11y.End(&span, &err)
 	span.SetAttributes(
 		attribute.String("broadcaster_id", broadcasterID),
-		attribute.Int("message_type", int(messageType)),
+		attribute.Int("message_type", messageType),
 	)
 
 	chunkHistogram, _ := o11y.Meter.Int64Histogram("send_message.chunks")
@@ -66,7 +66,7 @@ func (m *Messages) SendMessage(ctx context.Context,
 		chunkHistogram.Record(ctx, int64(numChunks),
 			metric.WithAttributes(
 				attribute.String("broadcaster_id", broadcasterID),
-				attribute.Int("message_type", int(messageType)),
+				attribute.Int("message_type", messageType),
 			),
 		)
 	}
