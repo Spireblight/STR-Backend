@@ -28,7 +28,7 @@ func (a *API) postMessageHandler(c *gin.Context) {
 	}
 
 	// do some initial validation on the parsed message
-	if pubSubMessage.Streamer.Login == "" || pubSubMessage.Streamer.Secret == "" {
+	if pubSubMessage.Streamer == nil || pubSubMessage.Streamer.Login == "" || pubSubMessage.Streamer.Secret == "" {
 		err := &errors2.AuthError{Err: errors.New("missing login or secret")}
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -69,7 +69,7 @@ func (a *API) broadcast(c *gin.Context,
 		attribute.Int("delay_ms", msg.Delay),
 	))
 
-	err := a.broadcaster.Broadcast(ctx, time.Duration(msg.Delay)*time.Millisecond, userID, int(msg.MessageType), msg.MessageContent)
+	err := a.broadcaster.Broadcast(ctx, time.Duration(msg.Delay)*a.broadcastDelayIncrement, userID, int(msg.MessageType), msg.MessageContent)
 	timeout := &errors2.Timeout{}
 	if errors.As(err, &timeout) {
 		c.Data(202, "application/json; charset=utf-8", []byte("Success\n"))

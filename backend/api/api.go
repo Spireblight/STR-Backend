@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -26,6 +27,9 @@ type API struct {
 	users       UserAuthenticator
 	broadcaster *broadcaster.Broadcaster
 
+	// Increment to consider when reading msg.Delay. IE. is the caller sending us delay values in ms, s, etc.
+	broadcastDelayIncrement time.Duration
+
 	deckLists map[string]string
 	deckLock  *sync.RWMutex
 }
@@ -42,10 +46,12 @@ func New(u UserAuthenticator, b *broadcaster.Broadcaster) (*API, error) {
 	api := &API{
 		Router: r,
 
-		users:       u,
-		broadcaster: b,
-		deckLists:   make(map[string]string),
-		deckLock:    &sync.RWMutex{},
+		users:                   u,
+		broadcaster:             b,
+		broadcastDelayIncrement: time.Millisecond,
+
+		deckLists: make(map[string]string),
+		deckLock:  &sync.RWMutex{},
 	}
 
 	r.POST("/", api.postOldMessageHandler)
