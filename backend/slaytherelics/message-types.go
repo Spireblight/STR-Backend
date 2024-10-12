@@ -37,7 +37,7 @@ type Streamer struct {
 	Secret string `json:"secret,omitempty"`
 }
 
-// RequestMessage message format for incoming messages from the Java mod. Tags are used for JSON encoding, not decoding
+// PubSubMessage message format for incoming messages from the Java mod. Tags are used for JSON encoding, not decoding
 // Mod refs:
 // - https://github.com/Spireblight/STR-Spire-Mod/blob/17f3cc9fa79c01444f62201bd7901861c913ff9e/src/main/java/str_exporter/client/Message.java#L5
 // - https://github.com/Spireblight/STR-Spire-Mod/blob/main/src/main/java/str_exporter/builders/JSONMessageBuilder.java
