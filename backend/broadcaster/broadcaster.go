@@ -19,7 +19,7 @@ const keepAlive = 5
 var sentinel = struct{}{}
 
 type PubSub interface {
-	SendMessage(ctx context.Context, broadcasterID string, int int, message interface{}) error
+	SendMessage(ctx context.Context, broadcasterID string, messageType int, message interface{}) error
 }
 
 type Broadcaster struct {
