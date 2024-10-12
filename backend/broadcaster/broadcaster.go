@@ -146,7 +146,7 @@ func (s *sender) sendAll() (err error) {
 	span.SetAttributes(attribute.String("broadcaster_id", s.broadcasterID))
 
 	s.state.Range(func(typ, msg interface{}) bool {
-		sErr := s.broadcaster.messages.SendMessage(ctx, s.broadcasterID, typ.(int), msg.(map[string]any))
+		sErr := s.broadcaster.messages.SendMessage(ctx, s.broadcasterID, typ.(int), msg)
 		err = errors.Join(err, sErr)
 		return true
 	})
