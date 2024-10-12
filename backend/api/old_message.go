@@ -55,6 +55,7 @@ func (a *API) postOldMessageHandler(c *gin.Context) {
 	ctx, span := o11y.Tracer.Start(c.Request.Context(), "api: old post message")
 	defer o11y.End(&span, &err)
 
+	// same message format, just different auth call
 	pubSubMessage := slaytherelics.PubSubMessage{}
 	err = c.BindJSON(&pubSubMessage)
 	if err != nil {
