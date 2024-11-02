@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -60,11 +59,6 @@ func (a *API) getDeckHandler(c *gin.Context) {
 	c.Data(200, "text/plain", []byte(result.String()))
 }
 
-func escapeRegexp(s string) string {
-	r := regexp.MustCompile(`[-\/\\^$*+?.()|[\]{}]`)
-	return r.ReplaceAllString(s, "\\$&")
-}
-
 func decompress(s string) (string, error) {
 	parts := strings.Split(s, "||")
 	if len(parts) < 2 {
@@ -77,11 +71,7 @@ func decompress(s string) (string, error) {
 	for i := len(compressionDict) - 1; i >= 0; i-- {
 		word := compressionDict[i]
 		wildCard := fmt.Sprintf("&%c", WILDCARDS[i])
-		r, err := regexp.Compile(escapeRegexp(wildCard))
-		if err != nil {
-			return "", err
-		}
-		text = r.ReplaceAllString(text, word)
+		text = strings.ReplaceAll(text, wildCard, word)
 	}
 	return text, nil
 }
