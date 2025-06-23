@@ -2,9 +2,14 @@ package api
 
 import (
 	"fmt"
+	"io"
+	"net/http/httptest"
+	"os"
 	"strings"
+	"sync"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"gotest.tools/v3/assert"
 )
 
@@ -87,6 +92,91 @@ func TestDecompress(t *testing.T) {
 
 			assert.NilError(t, err)
 			assert.Equal(t, actualOutput, tc.output)
+		})
+	}
+}
+
+func TestDecompressIntegration(t *testing.T) {
+	// cases straight from mod output
+	testCases := []struct {
+		desc      string
+		inputFile string
+	}{
+		{
+			desc:      "Very large deck",
+			inputFile: "testdata/breaking-1.txt",
+		},
+		{
+			desc:      "Another very large deck",
+			inputFile: "testdata/breaking-2.txt",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			inpFile, err := os.Open(tc.inputFile)
+			assert.NilError(t, err)
+			defer inpFile.Close()
+
+			inp, err := io.ReadAll(inpFile)
+			assert.NilError(t, err)
+
+			actualOutput, err := decompress(string(inp))
+			assert.NilError(t, err)
+
+			// should be no & symbols
+			assert.Equal(t, strings.Contains(actualOutput, "&"), false, actualOutput)
+		})
+	}
+}
+
+// trying to replicate JSON escape HTML issue
+func TestDecompressAPIIntegration(t *testing.T) {
+	// cases straight from mod output
+	testCases := []struct {
+		desc      string
+		inputFile string
+	}{
+		{
+			desc:      "Very large deck",
+			inputFile: "testdata/breaking-1.txt",
+		},
+		{
+			desc:      "Another very large deck",
+			inputFile: "testdata/breaking-2.txt",
+		},
+	}
+
+	apiHandler := &API{
+		deckLists: make(map[string]string),
+		deckLock:  &sync.RWMutex{},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			inpFile, err := os.Open(tc.inputFile)
+			assert.NilError(t, err)
+			defer inpFile.Close()
+
+			inp, err := io.ReadAll(inpFile)
+			assert.NilError(t, err)
+
+			apiHandler.deckLists["test"] = string(inp)
+
+			respW := httptest.NewRecorder()
+			testCtx, _ := gin.CreateTestContext(respW)
+			testCtx.Params = gin.Params{
+				{Key: "name", Value: "test"},
+			}
+
+			apiHandler.getDeckHandler(testCtx)
+
+			assert.Equal(t, respW.Code, 200)
+
+			actualOutput := respW.Body.String()
+
+			// should be no & symbols
+			assert.Equal(t, strings.Contains(actualOutput, "&"), false, actualOutput)
 		})
 	}
 }
